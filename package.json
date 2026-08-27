@@ -1,0 +1,14 @@
+{
+  "name": "ehoser-learning",
+  "version": "1.0.0",
+  "description": "Ehoser Learning platform with access control, language learning, math and German practice, and DeepL-powered dictionary support.",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js"
+  },
+  "dependencies": {
+    "dotenv": "^16.4.5",
+    "express": "^4.19.2"
+  }
+}

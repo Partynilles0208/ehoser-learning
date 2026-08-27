@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="de">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Ehoser Learning</title>
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body>
+    <div class="app-shell">
+      <header class="topbar">
+        <div>
+          <p class="eyebrow">Ehoser Learning</p>
+          <h1>Sprache, Mathe & Deutsch smarter lernen</h1>
+        </div>
+      </header>
+
+      <main>
+        <section id="gate" class="card gate-card">
+          <h2>Zugang</h2>
+          <p>Bitte gib den Zugangscode ein, um zur Lernplattform zu gelangen.</p>
+          <form id="accessForm">
+            <label for="codeInput">Zugangscode</label>
+            <input id="codeInput" name="code" type="password" maxlength="4" placeholder="0028" />
+            <button type="submit">Einloggen</button>
+          </form>
+          <p id="gateMessage" class="status-text"></p>
+        </section>
+
+        <section id="dashboard" class="hidden">
+          <div class="stats">
+            <div class="stat-item">
+              <span>Sprachen</span>
+              <strong id="langCount">6</strong>
+            </div>
+            <div class="stat-item">
+              <span>Vokabeln</span>
+              <strong>120+</strong>
+            </div>
+            <div class="stat-item">
+              <span>Übungen</span>
+              <strong>24</strong>
+            </div>
+          </div>
+
+          <div class="dashboard-grid">
+            <section class="card">
+              <h3>Sprachen lernen</h3>
+              <div id="languageButtons" class="language-buttons"></div>
+            </section>
+
+            <section class="card">
+              <h3>Wort erklären</h3>
+              <form id="wordForm" class="stacked-form">
+                <label for="wordInput">Wort</label>
+                <input id="wordInput" type="text" placeholder="hello" />
+                <label for="wordLanguage">Sprache</label>
+                <select id="wordLanguage">
+                  <option value="en">English</option>
+                  <option value="fr">Französisch</option>
+                  <option value="de">Deutsch</option>
+                  <option value="es">Spanisch</option>
+                  <option value="it">Italienisch</option>
+                  <option value="tr">Türkisch</option>
+                </select>
+                <button type="submit">Erklärung anzeigen</button>
+              </form>
+              <div id="wordResult" class="result-box empty">Noch kein Wort ausgewählt.</div>
+            </section>
+
+            <section class="card">
+              <h3>Übersetzen mit DeepL</h3>
+              <form id="translateForm" class="stacked-form">
+                <label for="sourceText">Text</label>
+                <textarea id="sourceText" rows="3" placeholder="Gib einen Satz ein..."></textarea>
+                <div class="inline-group">
+                  <div>
+                    <label for="sourceLang">Von</label>
+                    <select id="sourceLang">
+                      <option value="de">Deutsch</option>
+                      <option value="en">English</option>
+                      <option value="fr">Französisch</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label for="targetLang">Nach</label>
+                    <select id="targetLang">
+                      <option value="en">English</option>
+                      <option value="fr">Französisch</option>
+                      <option value="de">Deutsch</option>
+                    </select>
+                  </div>
+                </div>
+                <button type="submit">Übersetzen</button>
+              </form>
+              <div id="translateResult" class="result-box empty">Noch keine Übersetzung.</div>
+            </section>
+
+            <section class="card">
+              <h3>Mathe</h3>
+              <div id="mathList" class="lesson-list"></div>
+            </section>
+
+            <section class="card">
+              <h3>Deutsch</h3>
+              <div id="germanList" class="lesson-list"></div>
+            </section>
+          </div>
+        </section>
+      </main>
+    </div>
+
+    <script src="/app.js"></script>
+  </body>
+</html>
