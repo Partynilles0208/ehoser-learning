@@ -3,109 +3,251 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="Ehoser Learning – professioneller Sprach-, Mathe- und Deutsch-Lernbereich mit Zugangscode." />
     <title>Ehoser Learning</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
     <link rel="stylesheet" href="/styles.css" />
   </head>
   <body>
-    <div class="app-shell">
-      <header class="topbar">
-        <div>
-          <p class="eyebrow">Ehoser Learning</p>
-          <h1>Sprache, Mathe & Deutsch smarter lernen</h1>
+    <div id="gate" class="gate-shell">
+      <div class="gate-card">
+        <div class="gate-copy">
+          <div class="brand-mini">
+            <span class="brand-icon">E</span>
+            <div>
+              <span class="brand-name">ehoser</span>
+              <span class="brand-sub">learning</span>
+            </div>
+          </div>
+          <div class="kicker">secure access</div>
+          <h2>Bitte Zugangscode eingeben</h2>
+          <p>Willkommen bei Ehoser Learning. Nach erfolgreichem Login öffnet sich die komplette Lernplattform mit Sprachen, Fächern, Übersetzung und praktischen Übungen.</p>
         </div>
-      </header>
 
-      <main>
-        <section id="gate" class="card gate-card">
-          <h2>Zugang</h2>
-          <p>Bitte gib den Zugangscode ein, um zur Lernplattform zu gelangen.</p>
-          <form id="accessForm">
+        <div class="gate-panel">
+          <form id="accessForm" class="access-form">
             <label for="codeInput">Zugangscode</label>
-            <input id="codeInput" name="code" type="password" maxlength="4" placeholder="0028" />
+            <input id="codeInput" name="code" type="password" maxlength="6" placeholder="020818" />
             <button type="submit">Einloggen</button>
           </form>
           <p id="gateMessage" class="status-text"></p>
+        </div>
+      </div>
+    </div>
+
+    <div id="dashboard" class="landing-page hidden">
+      <header class="topbar">
+        <div class="brand-wrap">
+          <div class="brand-mark">E</div>
+          <div class="brand-text">
+            <span class="brand-name">ehoser</span>
+            <span class="brand-sub">learning</span>
+          </div>
+        </div>
+
+        <nav class="main-nav" aria-label="Hauptnavigation">
+          <a href="#">Startseite</a>
+          <a href="#">Sprachen</a>
+          <a href="#">Fächer</a>
+          <a href="#">Übersetzung</a>
+          <a href="#">Lernen</a>
+          <a href="#">Über uns</a>
+        </nav>
+
+        <div class="header-actions">
+          <button class="icon-button" aria-label="Suche">⌕</button>
+          <button class="icon-button" aria-label="Einstellungen">◌</button>
+          <button class="login-button">Anmelden</button>
+        </div>
+      </header>
+
+      <main class="content-shell">
+        <section class="hero-section">
+          <div class="hero-copy">
+            <h1>Lerne Sprachen.<br />Verstehe die Welt.<br /><span>Entfalte dein Potenzial.</span></h1>
+            <p>
+              Ehoser Learning hilft dir, Sprachen zu meistern, Fächer zu verstehen und Inhalte in Sekunden zu übersetzen.
+              Dein Weg zum Wissen – einfach, schnell und effektiv.
+            </p>
+            <div class="cta-row">
+              <button class="primary-btn">Jetzt starten</button>
+              <button class="secondary-btn">Mehr entdecken</button>
+            </div>
+          </div>
+
+          <div class="hero-visual" aria-label="Globale Sprachlandschaft">
+            <div class="globe">
+              <div class="label label-top">Hello</div>
+              <div class="label label-right">Hallo</div>
+              <div class="label label-left">Hola</div>
+              <div class="label label-bottom">Bonjour</div>
+              <div class="label label-small">你好</div>
+              <div class="label label-arabic">مرحبا</div>
+            </div>
+          </div>
         </section>
 
-        <section id="dashboard" class="hidden">
-          <div class="stats">
-            <div class="stat-item">
-              <span>Sprachen</span>
-              <strong id="langCount">6</strong>
+        <section class="language-section">
+          <div class="section-header">
+            <div class="section-title-wrap">
+              <span class="section-icon">◌</span>
+              <div>
+                <h3>Sprachen lernen</h3>
+                <p>Wähle eine Sprache und starte heute noch!</p>
+              </div>
             </div>
-            <div class="stat-item">
-              <span>Vokabeln</span>
-              <strong>120+</strong>
-            </div>
-            <div class="stat-item">
-              <span>Übungen</span>
-              <strong>24</strong>
-            </div>
+            <button class="ghost-button">Alle Sprachen anzeigen</button>
           </div>
 
-          <div class="dashboard-grid">
-            <section class="card">
-              <h3>Sprachen lernen</h3>
-              <div id="languageButtons" class="language-buttons"></div>
-            </section>
+          <div class="language-grid">
+            <div class="language-card"><span class="flag">🇩🇪</span><strong>Deutsch</strong><small>A1 - C2</small></div>
+            <div class="language-card"><span class="flag">🇬🇧</span><strong>Englisch</strong><small>A1 - C2</small></div>
+            <div class="language-card"><span class="flag">🇫🇷</span><strong>Französisch</strong><small>A1 - C2</small></div>
+            <div class="language-card"><span class="flag">🇪🇸</span><strong>Spanisch</strong><small>A1 - C2</small></div>
+            <div class="language-card"><span class="flag">🇮🇹</span><strong>Italienisch</strong><small>A1 - C2</small></div>
+            <div class="language-card"><span class="flag">🇨🇳</span><strong>Chinesisch</strong><small>A1 - C2</small></div>
+            <div class="language-card more-card"><span class="flag">•••</span><strong>Mehr Sprachen</strong><small>Entdecken</small></div>
+          </div>
+        </section>
 
-            <section class="card">
-              <h3>Wort erklären</h3>
-              <form id="wordForm" class="stacked-form">
-                <label for="wordInput">Wort</label>
-                <input id="wordInput" type="text" placeholder="hello" />
-                <label for="wordLanguage">Sprache</label>
-                <select id="wordLanguage">
-                  <option value="en">English</option>
-                  <option value="fr">Französisch</option>
-                  <option value="de">Deutsch</option>
-                  <option value="es">Spanisch</option>
-                  <option value="it">Italienisch</option>
-                  <option value="tr">Türkisch</option>
+        <section class="stats-strip">
+          <div class="stat-card">
+            <strong>120K+</strong>
+            <span>Lernstunden</span>
+          </div>
+          <div class="stat-card">
+            <strong>43%</strong>
+            <span>schnelleres Lernen</span>
+          </div>
+          <div class="stat-card">
+            <strong>93%</strong>
+            <span>Zufriedenheit</span>
+          </div>
+          <div class="stat-card">
+            <strong>24/7</strong>
+            <span>Verfügbar</span>
+          </div>
+        </section>
+
+        <section class="feature-grid">
+          <article class="feature-panel feature-list-panel">
+            <div class="panel-head">
+              <span class="panel-icon">◌</span>
+              <h4>Fächer verstehen</h4>
+            </div>
+            <ul>
+              <li>Deutsch <span>›</span></li>
+              <li>Mathe <span>›</span></li>
+              <li>Physik <span>›</span></li>
+              <li>Biologie <span>›</span></li>
+            </ul>
+            <button class="mini-link">Alle Fächer anzeigen</button>
+          </article>
+
+          <article class="feature-panel translator-panel">
+            <div class="panel-head">
+              <span class="panel-icon">A</span>
+              <h4>Übersetzung</h4>
+            </div>
+            <div class="translator-form">
+              <div class="select-row">
+                <select>
+                  <option>Deutsch</option>
+                  <option>English</option>
+                  <option>Französisch</option>
                 </select>
-                <button type="submit">Erklärung anzeigen</button>
-              </form>
-              <div id="wordResult" class="result-box empty">Noch kein Wort ausgewählt.</div>
-            </section>
+                <span class="swap">⇄</span>
+                <select>
+                  <option>Englisch</option>
+                  <option>Deutsch</option>
+                  <option>Französisch</option>
+                </select>
+              </div>
+              <textarea placeholder="Text eingeben..."></textarea>
+              <button class="primary-btn translate-btn">Übersetzen</button>
+            </div>
+            <div class="trust-row">
+              <span>100+ Sprachen</span>
+              <span>KI unterstützt</span>
+              <span>Schnell & Genau</span>
+            </div>
+          </article>
 
-            <section class="card">
-              <h3>Übersetzen mit DeepL</h3>
-              <form id="translateForm" class="stacked-form">
-                <label for="sourceText">Text</label>
-                <textarea id="sourceText" rows="3" placeholder="Gib einen Satz ein..."></textarea>
-                <div class="inline-group">
-                  <div>
-                    <label for="sourceLang">Von</label>
-                    <select id="sourceLang">
-                      <option value="de">Deutsch</option>
-                      <option value="en">English</option>
-                      <option value="fr">Französisch</option>
-                    </select>
-                  </div>
-                  <div>
-                    <label for="targetLang">Nach</label>
-                    <select id="targetLang">
-                      <option value="en">English</option>
-                      <option value="fr">Französisch</option>
-                      <option value="de">Deutsch</option>
-                    </select>
-                  </div>
-                </div>
-                <button type="submit">Übersetzen</button>
-              </form>
-              <div id="translateResult" class="result-box empty">Noch keine Übersetzung.</div>
-            </section>
+          <article class="feature-panel process-panel">
+            <div class="panel-head">
+              <span class="panel-icon">✦</span>
+              <h4>So funktioniert's</h4>
+            </div>
+            <ol>
+              <li><span>1</span> Wähle dein Ziel</li>
+              <li><span>2</span> Lerne & verstehe</li>
+              <li><span>3</span> Erreiche mehr</li>
+            </ol>
+            <p>Interaktive Inhalte, Übersetzungen und Übungen in einem klaren Lernpfad.</p>
+          </article>
+        </section>
 
-            <section class="card">
-              <h3>Mathe</h3>
-              <div id="mathList" class="lesson-list"></div>
-            </section>
-
-            <section class="card">
-              <h3>Deutsch</h3>
-              <div id="germanList" class="lesson-list"></div>
-            </section>
+        <section class="learning-paths">
+          <div class="path-card">
+            <div class="path-header">
+              <span class="mini-badge">Lernplan</span>
+              <h4>Dein individueller Weg</h4>
+            </div>
+            <ul>
+              <li><span class="bullet active"></span> Grammatik & Vokabeln</li>
+              <li><span class="bullet"></span> Konversation & Sprechen</li>
+              <li><span class="bullet"></span> Prüfungen & Tests</li>
+            </ul>
           </div>
+          <div class="path-card accent-card">
+            <div class="path-header">
+              <span class="mini-badge">Live-Tool</span>
+              <h4>Sprach-Check</h4>
+            </div>
+            <p>Teste deinen Wortschatz mit schnellen Übungen und Zielsetzungs-Feedback.</p>
+          </div>
+        </section>
+
+        <section class="workspace-panel">
+          <div class="mini-panel progress-panel">
+            <div class="panel-head">
+              <span class="panel-icon">★</span>
+              <h4>Mein Fortschritt</h4>
+            </div>
+            <div class="progress-box">
+              <div class="score-pill">
+                <strong id="progressValue">0%</strong>
+                <small>abgeschlossen</small>
+              </div>
+              <div class="progress-bar">
+                <span id="progressFill"></span>
+              </div>
+            </div>
+            <button id="resetProgressBtn" class="mini-link">Fortschritt zurücksetzen</button>
+          </div>
+
+          <div class="mini-panel saved-panel">
+            <div class="panel-head">
+              <span class="panel-icon">✓</span>
+              <h4>Meine Merkliste</h4>
+            </div>
+            <ul id="savedWordsList" class="saved-word-list">
+              <li class="empty-state">Noch keine Wörter gespeichert.</li>
+            </ul>
+          </div>
+        </section>
+
+        <section class="cta-banner">
+          <div class="cta-copy">
+            <div class="award-mark">🏆</div>
+            <div>
+              <h4>Werde Teil von Ehoser Learning</h4>
+              <p>Tausende Lernende verbessern täglich ihre Fähigkeiten.</p>
+            </div>
+          </div>
+          <button class="primary-btn">Kostenlos starten</button>
         </section>
       </main>
     </div>
