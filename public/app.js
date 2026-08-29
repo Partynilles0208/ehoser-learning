@@ -11,9 +11,15 @@ const translateBtn = document.querySelector('.translate-btn');
 const translationText = document.querySelector('.translator-form textarea');
 const sourceLang = document.querySelectorAll('.translator-form select')[0];
 const targetLang = document.querySelectorAll('.translator-form select')[1];
+const translationResult = document.getElementById('translationResult');
+const languageButtons = document.querySelectorAll('.language-select-btn');
+const explainBtn = document.getElementById('explainBtn');
+const wordInput = document.getElementById('wordInput');
+const wordLang = document.getElementById('wordLang');
+const loginButton = document.querySelector('.login-button');
 
 const STORAGE_KEYS = {
-  auth: 'ehoser_learning_auth_state',
+  auth: 'ehoser_learning_auth_state', // values: 'true' | 'false' | 'guest'
   profile: 'ehoser_learning_profile'
 };
 
@@ -37,9 +43,20 @@ const saveProfile = (profile) => {
   localStorage.setItem(STORAGE_KEYS.profile, JSON.stringify(profile));
 };
 
-const setAuthState = (enabled) => {
-  localStorage.setItem(STORAGE_KEYS.auth, enabled ? 'true' : 'false');
+const setAuthState = (value) => {
+  if (value === 'guest') {
+    localStorage.setItem(STORAGE_KEYS.auth, 'guest');
+  } else {
+    localStorage.setItem(STORAGE_KEYS.auth, value ? 'true' : 'false');
+  }
 };
+
+const getSavedAuthRaw = () => localStorage.getItem(STORAGE_KEYS.auth) || 'false';
+const isSavedAuth = () => {
+  const raw = getSavedAuthRaw();
+  return raw === 'true' || raw === 'guest';
+};
+const isGuestAuth = () => getSavedAuthRaw() === 'guest';
 
 const showMessage = (element, message, isError = false) => {
   element.textContent = message;
@@ -109,11 +126,18 @@ const rememberLastLocale = () => {
 };
 
 async function checkSession() {
-  const savedAuth = localStorage.getItem(STORAGE_KEYS.auth) === 'true';
+  const savedAuth = isSavedAuth();
 
   try {
     const response = await fetch('/api/session');
-    const data = await response.json();
+    // handle non-OK (401) gracefully without throwing
+    let data = { authenticated: false };
+    try {
+      data = await response.json();
+    } catch (e) {
+      data = { authenticated: false };
+    }
+
     const authenticated = Boolean(data.authenticated || savedAuth);
     setAuthenticatedView(authenticated);
     setAuthState(authenticated);
@@ -123,6 +147,27 @@ async function checkSession() {
     setAuthState(savedAuth);
     return savedAuth;
   }
+}
+
+// Make primary CTAs interactive: if user not authenticated, show gate (login)
+const primaryButtons = document.querySelectorAll('.primary-btn');
+if (primaryButtons && primaryButtons.length) {
+  primaryButtons.forEach((btn) => {
+    btn.addEventListener('click', async (e) => {
+      e.preventDefault();
+      const isAuth = localStorage.getItem(STORAGE_KEYS.auth) === 'true';
+      if (!isAuth) {
+        setAuthenticatedView(false);
+        showMessage(gateMessage, 'Bitte zuerst einloggen (Zugangscode).', false);
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+        return;
+      }
+
+      // if authenticated, try to scroll to main content
+      const main = document.querySelector('.content-shell');
+      if (main) main.scrollIntoView({ behavior: 'smooth' });
+    });
+  });
 }
 
 async function loginWithCode(code) {
@@ -138,31 +183,155 @@ async function loginWithCode(code) {
 
 async function translateCurrentText() {
   const value = (translationText.value || '').trim();
-  const source = sourceLang.value;
-  const target = targetLang.value;
+  const source = (sourceLang && sourceLang.value) || document.getElementById('translatorSource')?.value || 'de';
+  const target = (targetLang && targetLang.value) || document.getElementById('translatorTarget')?.value || 'en';
 
   if (!value) {
     showMessage(gateMessage, 'Bitte zuerst einen Text eingeben.', true);
     return;
   }
 
-  const response = await fetch('/api/translate', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ text: value, sourceLang: source, targetLang: target })
-  });
+  let data = null;
+  try {
+    const response = await fetch('/api/translate', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ text: value, sourceLang: source, targetLang: target })
+    });
 
-  const data = await response.json();
+    if (response.status === 401) {
+      // server requires auth — fall back to demo translation in guest/local mode
+      data = { translation: `Demo-Übersetzung für: ${value}`, provider: 'demo' };
+    } else {
+      data = await response.json();
+    }
+  } catch (err) {
+    data = { translation: `Demo-Übersetzung für: ${value}`, provider: 'demo' };
+  }
   localStorage.setItem('ehoser_learning_locale', `${source}|${target}`);
 
   if (data && data.translation) {
     translationText.value = `${data.translation}`;
     persistRecentTranslation(value, data.translation);
     addSavedWord(value, data.translation);
+    if (translationResult) translationResult.textContent = data.translation;
     showMessage(gateMessage, 'Übersetzung gespeichert und im Lernfortschritt ergänzt.', false);
+    // speak the translation
+    try {
+      const utter = new SpeechSynthesisUtterance(data.translation);
+      const langMap = { en: 'en-US', de: 'de-DE', fr: 'fr-FR', es: 'es-ES', it: 'it-IT', zh: 'zh-CN' };
+      utter.lang = langMap[target] || target || 'de-DE';
+      window.speechSynthesis.cancel();
+      window.speechSynthesis.speak(utter);
+    } catch (e) {
+      // ignore TTS failures
+    }
   } else {
     showMessage(gateMessage, data?.error || 'Übersetzung fehlgeschlagen.', true);
   }
+}
+
+// Language selection buttons
+if (languageButtons && languageButtons.length) {
+  languageButtons.forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const lang = btn.dataset.lang;
+      if (!lang) return;
+      // set translator source/target intelligently
+      const src = document.getElementById('translatorSource');
+      const tgt = document.getElementById('translatorTarget');
+      if (src && tgt) {
+        src.value = lang;
+        // choose a sensible opposite target
+        tgt.value = lang === 'de' ? 'en' : 'de';
+      }
+      showMessage(gateMessage, `Sprache gesetzt: ${lang}`, false);
+    });
+  });
+}
+
+// Dictionary explanation button
+if (explainBtn && wordInput && wordLang) {
+  explainBtn.addEventListener('click', async () => {
+    const word = String(wordInput.value || '').trim();
+    const lang = String(wordLang.value || 'en').toLowerCase();
+    if (!word) {
+      showMessage(gateMessage, 'Bitte zuerst ein Wort eingeben.', true);
+      return;
+    }
+
+    try {
+      const res = await fetch(`/api/dictionary/${lang}/${encodeURIComponent(word)}`);
+      const data = await res.json();
+      const container = document.getElementById('wordResult');
+      if (container) {
+        container.innerHTML = `<h4>${word} → ${data.translation || '—'}</h4>
+          <p><strong>${data.partOfSpeech || ''}</strong></p>
+          <p>${data.explanation || ''}</p>
+          <p><em>${(data.examples || []).slice(0,2).join(' | ')}</em></p>
+          <button id="saveWordBtn">Merken</button>`;
+
+        const saveBtn = document.getElementById('saveWordBtn');
+        if (saveBtn) saveBtn.addEventListener('click', () => {
+          addSavedWord(word, data.translation || '—');
+          showMessage(gateMessage, 'Wort zur Merkliste hinzugefügt.', false);
+        });
+      }
+    } catch (err) {
+      showMessage(gateMessage, 'Wortabfrage fehlgeschlagen.', true);
+    }
+  });
+}
+
+// Header login button: toggles login view or logs out
+if (loginButton) {
+  loginButton.addEventListener('click', async () => {
+    const saved = getSavedAuthRaw();
+    const isAuth = saved === 'true' || saved === 'guest';
+    if (!isAuth) {
+      // open gate/modal for login
+      setAuthenticatedView(false);
+      showMessage(gateMessage, 'Bitte Zugangscode eingeben oder als Gast fortfahren.', false);
+      // scroll to top to reveal gate
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+      return;
+    }
+
+    // if authenticated (including guest), perform logout
+    try {
+      await fetch('/api/logout', { method: 'POST' });
+    } catch (e) {}
+    setAuthState(false);
+    setAuthenticatedView(false);
+    showMessage(gateMessage, 'Ausgeloggt.', false);
+  });
+}
+
+// Auth modal behavior (for CTA)
+const authModal = document.getElementById('authModal');
+const modalLogin = document.getElementById('modalLogin');
+const modalGuest = document.getElementById('modalGuest');
+
+const showAuthModal = () => { if (authModal) { authModal.classList.remove('hidden'); authModal.setAttribute('aria-hidden','false'); } };
+const hideAuthModal = () => { if (authModal) { authModal.classList.add('hidden'); authModal.setAttribute('aria-hidden','true'); } };
+
+if (modalGuest) {
+  modalGuest.addEventListener('click', () => {
+    setAuthState('guest');
+    setAuthenticatedView(true);
+    hideAuthModal();
+    showMessage(gateMessage, 'Du bist als Gast eingeloggt. Einige Funktionen sind demo-basiert.', false);
+  });
+}
+
+if (modalLogin) {
+  modalLogin.addEventListener('click', () => {
+    hideAuthModal();
+    setAuthenticatedView(false);
+    // focus code input to allow login
+    codeInput?.focus();
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  });
 }
 
 accessForm.addEventListener('submit', async (event) => {

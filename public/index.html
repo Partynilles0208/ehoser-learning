@@ -29,7 +29,7 @@
         <div class="gate-panel">
           <form id="accessForm" class="access-form">
             <label for="codeInput">Zugangscode</label>
-            <input id="codeInput" name="code" type="password" maxlength="6" placeholder="020818" />
+            <input id="codeInput" name="code" type="password" maxlength="6" placeholder="••••••" aria-label="Zugangscode" />
             <button type="submit">Einloggen</button>
           </form>
           <p id="gateMessage" class="status-text"></p>
@@ -38,7 +38,43 @@
     </div>
 
     <div id="dashboard" class="landing-page hidden">
-      <header class="topbar">
+      <div class="dashboard-grid">
+        <aside class="sidebar">
+          <div class="sidebar-top">
+            <div class="brand-mark">E</div>
+            <div class="sidebar-title">
+              <strong>ehoser</strong>
+              <small>Learning</small>
+            </div>
+          </div>
+
+          <nav class="side-nav">
+            <button class="side-item active">🏠 Dashboard</button>
+            <button class="side-item">🌐 Sprachen</button>
+            <button class="side-item">📚 Fächer</button>
+            <button class="side-item">🔤 Übersetzung</button>
+            <button class="side-item">🎯 Lernen</button>
+            <button class="side-item">⭐ Favoriten</button>
+            <button class="side-item">📈 Fortschritt</button>
+            <button class="side-item">⚙️ Einstellungen</button>
+          </nav>
+
+          <div class="sidebar-cta">
+            <div class="premium-box">
+              <div class="crown">♛</div>
+              <div>
+                <strong>ehoser Learning</strong>
+                <div class="small muted">Mehr Funktionen. Keine Grenzen.</div>
+                <button class="primary-btn" style="margin-top:8px;">Upgrade sichern</button>
+              </div>
+            </div>
+          </div>
+
+          <footer class="sidebar-foot">© 2025 ehoser Learning</footer>
+        </aside>
+
+        <div class="main-area">
+          <header class="topbar">
         <div class="brand-wrap">
           <div class="brand-mark">E</div>
           <div class="brand-text">
@@ -102,13 +138,13 @@
           </div>
 
           <div class="language-grid">
-            <div class="language-card"><span class="flag">🇩🇪</span><strong>Deutsch</strong><small>A1 - C2</small></div>
-            <div class="language-card"><span class="flag">🇬🇧</span><strong>Englisch</strong><small>A1 - C2</small></div>
-            <div class="language-card"><span class="flag">🇫🇷</span><strong>Französisch</strong><small>A1 - C2</small></div>
-            <div class="language-card"><span class="flag">🇪🇸</span><strong>Spanisch</strong><small>A1 - C2</small></div>
-            <div class="language-card"><span class="flag">🇮🇹</span><strong>Italienisch</strong><small>A1 - C2</small></div>
-            <div class="language-card"><span class="flag">🇨🇳</span><strong>Chinesisch</strong><small>A1 - C2</small></div>
-            <div class="language-card more-card"><span class="flag">•••</span><strong>Mehr Sprachen</strong><small>Entdecken</small></div>
+              <button class="language-card language-select-btn" data-lang="de"><span class="flag">🇩🇪</span><strong>Deutsch</strong><small>A1 - C2</small></button>
+              <button class="language-card language-select-btn" data-lang="en"><span class="flag">🇬🇧</span><strong>Englisch</strong><small>A1 - C2</small></button>
+              <button class="language-card language-select-btn" data-lang="fr"><span class="flag">🇫🇷</span><strong>Französisch</strong><small>A1 - C2</small></button>
+              <button class="language-card language-select-btn" data-lang="es"><span class="flag">🇪🇸</span><strong>Spanisch</strong><small>A1 - C2</small></button>
+              <button class="language-card language-select-btn" data-lang="it"><span class="flag">🇮🇹</span><strong>Italienisch</strong><small>A1 - C2</small></button>
+              <button class="language-card language-select-btn" data-lang="zh"><span class="flag">🇨🇳</span><strong>Chinesisch</strong><small>A1 - C2</small></button>
+              <div class="language-card more-card"><span class="flag">•••</span><strong>Mehr Sprachen</strong><small>Entdecken</small></div>
           </div>
         </section>
 
@@ -152,21 +188,22 @@
               <h4>Übersetzung</h4>
             </div>
             <div class="translator-form">
-              <div class="select-row">
-                <select>
-                  <option>Deutsch</option>
-                  <option>English</option>
-                  <option>Französisch</option>
-                </select>
-                <span class="swap">⇄</span>
-                <select>
-                  <option>Englisch</option>
-                  <option>Deutsch</option>
-                  <option>Französisch</option>
-                </select>
-              </div>
-              <textarea placeholder="Text eingeben..."></textarea>
-              <button class="primary-btn translate-btn">Übersetzen</button>
+                <div class="select-row">
+                  <select id="translatorSource">
+                    <option value="de">Deutsch</option>
+                    <option value="en">English</option>
+                    <option value="fr">Französisch</option>
+                  </select>
+                  <span class="swap">⇄</span>
+                  <select id="translatorTarget">
+                    <option value="en">English</option>
+                    <option value="de">Deutsch</option>
+                    <option value="fr">Französisch</option>
+                  </select>
+                </div>
+                <textarea id="translatorText" placeholder="Text eingeben..."></textarea>
+                <button class="primary-btn translate-btn">Übersetzen</button>
+                <div id="translationResult" class="translation-result">Noch keine Übersetzung.</div>
             </div>
             <div class="trust-row">
               <span>100+ Sprachen</span>
@@ -250,8 +287,21 @@
           <button class="primary-btn">Kostenlos starten</button>
         </section>
       </main>
+        </div>
+      </div>
     </div>
 
     <script src="/app.js"></script>
+    <!-- Auth modal for CTA -->
+    <div id="authModal" class="modal hidden" aria-hidden="true">
+      <div class="modal-card">
+        <h3>Willkommen bei Ehoser Learning</h3>
+        <p>Bitte zuerst einloggen oder als Gast fortfahren, um die Inhalte zu sehen.</p>
+        <div class="modal-actions">
+          <button id="modalLogin" class="secondary-btn">Anmelden</button>
+          <button id="modalGuest" class="primary-btn">Als Gast fortfahren</button>
+        </div>
+      </div>
+    </div>
   </body>
 </html>

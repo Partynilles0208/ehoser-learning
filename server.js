@@ -6,7 +6,7 @@ dotenv.config();
 
 const app = express();
 const PORT = process.env.PORT || 3000;
-const ACCESS_CODE = (process.env.ACCESS_CODE || '020818').toString();
+const ACCESS_CODE = (process.env.ACCESS_CODE || 'SET_YOUR_PRIVATE_ACCESS_CODE').toString();
 const SESSION_COOKIE = 'ehoser_session';
 const isVercel = !!process.env.VERCEL;
 
