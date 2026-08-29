@@ -1,22 +1,4 @@
-const gate = document.getElementById('gate');
-const dashboard = document.getElementById('dashboard');
-const gateMessage = document.getElementById('gateMessage');
-const accessForm = document.getElementById('accessForm');
-const codeInput = document.getElementById('codeInput');
-const progressValue = document.getElementById('progressValue');
-const progressFill = document.getElementById('progressFill');
-const savedWordsList = document.getElementById('savedWordsList');
-const resetProgressBtn = document.getElementById('resetProgressBtn');
-const translateBtn = document.querySelector('.translate-btn');
-const translationText = document.querySelector('.translator-form textarea');
-const sourceLang = document.querySelectorAll('.translator-form select')[0];
-const targetLang = document.querySelectorAll('.translator-form select')[1];
-const translationResult = document.getElementById('translationResult');
-const languageButtons = document.querySelectorAll('.language-select-btn');
-const explainBtn = document.getElementById('explainBtn');
-const wordInput = document.getElementById('wordInput');
-const wordLang = document.getElementById('wordLang');
-const loginButton = document.querySelector('.login-button');
+let gate, dashboard, gateMessage, accessForm, codeInput, progressValue, progressFill, savedWordsList, resetProgressBtn, translateBtn, translationText, sourceLang, targetLang, translationResult, languageButtons, explainBtn, wordInput, wordLang, loginButton;
 
 const STORAGE_KEYS = {
   auth: 'ehoser_learning_auth_state', // values: 'true' | 'false' | 'guest'
@@ -377,6 +359,178 @@ if (sourceLang && targetLang) {
   });
 }
 
-rememberLastLocale();
-updateProgressUI();
-checkSession();
+document.addEventListener('DOMContentLoaded', () => {
+  gate = document.getElementById('gate');
+  dashboard = document.getElementById('dashboard');
+  gateMessage = document.getElementById('gateMessage');
+  accessForm = document.getElementById('accessForm');
+  codeInput = document.getElementById('codeInput');
+  progressValue = document.getElementById('progressValue');
+  progressFill = document.getElementById('progressFill');
+  savedWordsList = document.getElementById('savedWordsList');
+  resetProgressBtn = document.getElementById('resetProgressBtn');
+  translateBtn = document.querySelector('.translate-btn');
+  translationText = document.getElementById('translatorText') || document.querySelector('.translator-form textarea');
+  sourceLang = document.getElementById('translatorSource') || document.querySelectorAll('.translator-form select')[0];
+  targetLang = document.getElementById('translatorTarget') || document.querySelectorAll('.translator-form select')[1];
+  translationResult = document.getElementById('translationResult');
+  languageButtons = document.querySelectorAll('.language-select-btn');
+  explainBtn = document.getElementById('explainBtn');
+  wordInput = document.getElementById('wordInput');
+  wordLang = document.getElementById('wordLang');
+  loginButton = document.querySelector('.login-button');
+
+  rememberLastLocale();
+  updateProgressUI();
+  checkSession();
+
+  // rebind interactive handlers that rely on DOM
+
+  // Make primary CTAs interactive: if user not authenticated, show gate (login)
+  const primaryButtons = document.querySelectorAll('.primary-btn');
+  if (primaryButtons && primaryButtons.length) {
+    primaryButtons.forEach((btn) => {
+      btn.addEventListener('click', async (e) => {
+        e.preventDefault();
+        const isAuth = localStorage.getItem(STORAGE_KEYS.auth) === 'true' || localStorage.getItem(STORAGE_KEYS.auth) === 'guest';
+        if (!isAuth) {
+          setAuthenticatedView(false);
+          showMessage(gateMessage, 'Bitte zuerst einloggen (Zugangscode).', false);
+          // try showing modal if available
+          const authModal = document.getElementById('authModal');
+          if (authModal) authModal.classList.remove('hidden');
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+          return;
+        }
+
+        // if authenticated, try to scroll to main content
+        const main = document.querySelector('.content-shell');
+        if (main) main.scrollIntoView({ behavior: 'smooth' });
+      });
+    });
+  }
+
+  // basic handlers
+  if (resetProgressBtn) {
+    resetProgressBtn.addEventListener('click', () => {
+      const profile = buildDefaultProfile();
+      saveProfile(profile);
+      updateProgressUI();
+      showMessage(gateMessage, 'Lernfortschritt zurückgesetzt.', false);
+    });
+  }
+
+  if (translateBtn) {
+    translateBtn.addEventListener('click', translateCurrentText);
+  }
+
+  if (sourceLang && targetLang) {
+    [sourceLang, targetLang].forEach((field) => {
+      field.addEventListener('change', () => {
+        localStorage.setItem('ehoser_learning_locale', `${sourceLang.value}|${targetLang.value}`);
+      });
+    });
+  }
+
+  // Language selection buttons
+  if (languageButtons && languageButtons.length) {
+    languageButtons.forEach((btn) => {
+      btn.addEventListener('click', () => {
+        const lang = btn.dataset.lang;
+        if (!lang) return;
+        // set translator source/target intelligently
+        const src = document.getElementById('translatorSource');
+        const tgt = document.getElementById('translatorTarget');
+        if (src && tgt) {
+          src.value = lang;
+          // choose a sensible opposite target
+          tgt.value = lang === 'de' ? 'en' : 'de';
+        }
+        showMessage(gateMessage, `Sprache gesetzt: ${lang}`, false);
+      });
+    });
+  }
+
+  // Header login button behavior
+  if (loginButton) {
+    loginButton.addEventListener('click', async () => {
+      const saved = getSavedAuthRaw();
+      const isAuth = saved === 'true' || saved === 'guest';
+      if (!isAuth) {
+        setAuthenticatedView(false);
+        showMessage(gateMessage, 'Bitte Zugangscode eingeben oder als Gast fortfahren.', false);
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+        return;
+      }
+
+      try { await fetch('/api/logout', { method: 'POST' }); } catch (e) {}
+      setAuthState(false);
+      setAuthenticatedView(false);
+      showMessage(gateMessage, 'Ausgeloggt.', false);
+    });
+  }
+
+  // Auth modal handlers
+  const modalGuest = document.getElementById('modalGuest');
+  const modalLogin = document.getElementById('modalLogin');
+  const authModal = document.getElementById('authModal');
+  if (modalGuest) {
+    modalGuest.addEventListener('click', () => {
+      setAuthState('guest');
+      setAuthenticatedView(true);
+      if (authModal) authModal.classList.add('hidden');
+      showMessage(gateMessage, 'Du bist als Gast eingeloggt. Einige Funktionen sind demo-basiert.', false);
+    });
+  }
+  if (modalLogin) {
+    modalLogin.addEventListener('click', () => {
+      if (authModal) authModal.classList.add('hidden');
+      setAuthenticatedView(false);
+      codeInput?.focus();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
+  }
+
+  // dictionary explain button binding
+  const explainBtnLocal = document.getElementById('explainBtn');
+  const wordInputLocal = document.getElementById('wordInput');
+  const wordLangLocal = document.getElementById('wordLang');
+  if (explainBtnLocal && wordInputLocal && wordLangLocal) {
+    explainBtnLocal.addEventListener('click', async () => {
+      const word = String(wordInputLocal.value || '').trim();
+      const lang = String(wordLangLocal.value || 'en').toLowerCase();
+      if (!word) { showMessage(gateMessage, 'Bitte zuerst ein Wort eingeben.', true); return; }
+      try {
+        const res = await fetch(`/api/dictionary/${lang}/${encodeURIComponent(word)}`);
+        const data = await res.json();
+        const container = document.getElementById('wordResult');
+        if (container) {
+          container.innerHTML = `<h4>${word} → ${data.translation || '—'}</h4><p><strong>${data.partOfSpeech||''}</strong></p><p>${data.explanation||''}</p>`;
+        }
+      } catch (err) { showMessage(gateMessage, 'Wortabfrage fehlgeschlagen.', true); }
+    });
+  }
+
+  // attach form submit
+  if (accessForm) {
+    accessForm.addEventListener('submit', async (event) => {
+      event.preventDefault();
+      const code = codeInput.value.trim();
+      const { ok, data } = await loginWithCode(code);
+      if (ok) {
+        const profile = readProfile();
+        profile.lastLoginAt = new Date().toISOString();
+        saveProfile(profile);
+        setAuthState(true);
+        setAuthenticatedView(true);
+        showMessage(gateMessage, 'Zugang freigeschaltet.', false);
+        codeInput.value = '';
+        return;
+      }
+      setAuthState(false);
+      setAuthenticatedView(false);
+      showMessage(gateMessage, data?.error || 'Zugang verweigert.', true);
+    });
+  }
+
+});
